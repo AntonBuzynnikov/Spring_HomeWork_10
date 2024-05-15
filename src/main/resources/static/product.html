@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>Добавить продукт</title>
+</head>
+<body>
+    <div class="main">
+        <div class="nav">
+        <ul class="menu">
+            <li class="menu-item"><a href="/index.html">Главная страница</a></li>
+            <li class="menu-item"><a href="/product.html">Позиция</a></li>
+            <li class="menu-item"><a href="/bid.html">Заказ</a></li>
+        </ul>
+        </div>
+        <div class="content">
+        <table class="products-table" id="products">
+            <tr class="products-table-title">
+                <td class="product-table-cell">Артикул</td>
+                <td class="product-table-cell">Наименование</td>
+                <td class="product-table-cell">Единица измерения</td>
+                <td class="product-table-cell">Цена за единицу</td>
+                <!-- <td class="product-table-cell"></td> -->
+            </tr>
+        </table>
+        <div id="update-product">
+            <form>
+                <h3>Изменить продукт</h3>
+                <input id="name-update" class="update-product-name" type="text" placeholder="Название продукта">
+                <input id="price-update" class="update-product-price" type="text" placeholder="Цена продукта">
+                <button type="submit" onclick="updateProduct();">Изменить продукт</button>
+            </form>
+        </div>
+        <form class="add-product">
+            <h3>Добавить продукт</h3>
+            <input id="name-product" class="add-product-name" type="text" placeholder="Название продукта">
+            <input id="weight-product" class="add-product-weight" type="text" placeholder="Вес одной единицы">
+            <input id="price-product" class="add-product-price" type="text" placeholder="Цена продукта">
+            <button type="submit" onclick="addProduct();">Добавить продукт</button>
+        </form>
+        </div>
+    </div>
+    <script>
+        function getAllProducts(){
+            fetch("http://localhost:8080/product/all")
+            .then(response=>response.json())
+            .then(data=>createTable(data))
+            .catch(error=>console.error("error: ", error));
+            
+        }
+
+        function createTable(data){
+            let productList = data;
+            let table = document.getElementById('products');
+            for(let i = 0; i < data.length; i++){
+                let product = productList[i];
+                let row = document.createElement('tr');
+                row.className = 'product-table-row';
+                for(let item in product){
+                    let cell = document.createElement('td');
+                    cell.className = 'product-table-cell';
+                    if(item == 'weight'){
+                        if(product[item] != '1.0'){
+                            cell.textContent = 'шт';
+                        } else{
+                            cell.textContent = 'кг';
+                        }
+                        row.appendChild(cell);
+                        continue;
+                    }
+                    cell.textContent = product[item];
+                    
+                    row.appendChild(cell);
+                }
+                let btnDelete = document.createElement('button');
+                btnDelete.type = 'submit';
+                btnDelete.className = 'btn-delete';
+                btnDelete.textContent = "Удалить";
+                btnDelete.addEventListener('click', deleteProduct);
+                row.appendChild(btnDelete)
+                let btnUpdate = document.createElement('button');
+                btnUpdate.type = 'submit';
+                btnUpdate.className = 'btn-update';
+                btnUpdate.textContent = "Изменить";
+                btnUpdate.addEventListener('click',updateForm);
+                row.appendChild(btnUpdate);
+                table.appendChild(row);
+            }
+        }
+        window.onload = getAllProducts;
+
+        function addProduct(){
+            let nameProduct = document.getElementById('name-product').value;
+            let weightProduct = document.getElementById('weight-product').value;
+            let priceProduct = document.getElementById('price-product').value;
+            let product = {
+                name : nameProduct,
+                weight : weightProduct,
+                price : priceProduct
+            };
+            fetch('http://localhost:8080/product/save',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(product)
+            })
+            .then(response=>{
+                    let data = response.json()[0];
+                    console.log(data);
+                    let table = document.getElementById('products');
+                    let row = document.createElement('tr');
+                    for(let item in data){
+                        let cell = document.createElement('td');
+                        cell.className = 'product-table-cell';
+                            if(item == 'weight'){
+                                if(data[item] != '1.0'){
+                                    cell.textContent = 'шт';
+                                } else{
+                                    cell.textContent = 'кг';
+                                }
+                                row.appendChild(cell);
+                                continue;
+                            }
+                        cell.textContent = data[item];
+                        row.appendChild(cell);
+                    }
+                    let btnDelete = document.createElement('button');
+                    btnDelete.type = 'submit';
+                    btnDelete.className = 'btn-delete';
+                    btnDelete.textContent = "Удалить";
+                    btnDelete.addEventListener('click', deleteProduct);
+                    row.appendChild(btnDelete);
+                    let btnUpdate = document.createElement('button');
+                    btnUpdate.type = 'submit';
+                    btnUpdate.className = 'btn-update';
+                    btnUpdate.textContent = "Изменить";
+                    btnUpdate.addEventListener('click',updateForm);
+                    row.appendChild(btnUpdate);
+                    table.appendChild(row);
+                });
+                window.location.reload();
+        }
+        function deleteProduct(event){
+            let parentElement;
+            if(event.target.tagName === 'BUTTON'){
+                parentElement = event.target.parentNode;
+            }
+            if(parentElement!= null){
+                let deleteId = parentElement.firstChild.textContent;
+                fetch('http://localhost:8080/product/delete/' + deleteId, {method: 'DELETE'}).
+                then(response => {
+                    if(response.status === 200){
+                        parentElement.remove();
+                    }
+                });
+            }
+        }
+        let idProduct;
+        let parrentEl;
+        function updateForm(event){
+            let form = document.getElementById('update-product');
+            form.style.display = form.style.display === 'block' ? 'none' : 'block';
+            if(event.target.tagName === 'BUTTON'){
+                parentEl = event.target.parentNode;
+            }
+            if(parentEl != null){
+                let children = parentEl.children;
+                let namePr = document.getElementById('name-update');
+                let pricePr = document.getElementById('price-update');
+                idProduct = children[0].textContent;
+                namePr.value = children[1].textContent;
+                pricePr.value = children[3].textContent;
+            }
+        }
+        // document.addEventListener('click',
+        //     function(event){
+        //         let form = document.getElementById('update-product');
+        //         if(!form.contains(event.target)){
+        //             updateForm();
+        //         }
+        //     }
+        // )
+        function updateProduct(){
+            let nameProduct = document.getElementById('name-update').value;
+            let priceProduct = document.getElementById('price-update').value;
+            let product = {
+                name : nameProduct,
+                weight : null,
+                price : priceProduct
+            };
+            fetch('http://localhost:8080/product/update/' + idProduct,{
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(product)
+                })
+                .then(response=>{
+                    if(response.status === 200){
+                        window.location.reload;
+                    }
+                });
+            updateForm();
+        }
+    </script>
+</body>
+
+</html>
