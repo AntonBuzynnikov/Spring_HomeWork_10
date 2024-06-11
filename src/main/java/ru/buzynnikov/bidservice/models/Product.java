@@ -18,6 +18,4 @@ public class Product {
     private BigDecimal weight;
     @Column(nullable = false)
     private BigDecimal price;
-//    private BigDecimal quantity;
-//    private BigDecimal consumption;
 }

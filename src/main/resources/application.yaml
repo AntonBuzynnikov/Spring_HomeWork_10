@@ -10,3 +10,8 @@ spring:
     url: jdbc:mysql://localhost:3306/bidService
     username: admin
     password: Lbcrjntrf12!
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics, info, prometheus

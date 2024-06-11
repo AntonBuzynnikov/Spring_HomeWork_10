@@ -2,7 +2,7 @@ package ru.buzynnikov.bidservice.dto;
 
 import lombok.Data;
 import ru.buzynnikov.bidservice.models.Product;
-import ru.buzynnikov.bidservice.models.User;
+import ru.buzynnikov.bidservice.security.models.User;
 
 import java.util.List;
 

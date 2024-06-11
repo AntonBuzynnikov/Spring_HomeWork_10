@@ -1,12 +1,15 @@
 package ru.buzynnikov.bidservice.models;
 
+import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.HashMap;
 import java.util.StringJoiner;
 
 @Data
+@Entity
 public class Consumption {
+    @Id
+    @Column(name = "id_product", nullable = false)
     private Long idProduct;
     private Double consumption;
 

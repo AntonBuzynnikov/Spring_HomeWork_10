@@ -4,8 +4,8 @@ package ru.buzynnikov.bidservice.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @Entity
@@ -16,4 +16,5 @@ public class Bid {
     private Long id;
     @Column(name = "time_create")
     private LocalDateTime timeCreate;
+    private BigDecimal sum;
 }

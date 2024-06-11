@@ -1,10 +1,8 @@
 package ru.buzynnikov.bidservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.math.BigDecimal;
-
+//Объект для добавления или обновления продукта
 @Data
 public class ProductDTO {
     private String name;
